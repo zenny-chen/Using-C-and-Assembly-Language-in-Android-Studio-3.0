@@ -8,21 +8,31 @@
 这条是关于CMake的：[CMake](https://developer.android.google.cn/ndk/guides/cmake)
 这条是关于在项目中使用C++代码的：[向您的项目添加 C 和 C++ 代码](https://developer.android.google.cn/studio/projects/add-native-code.html)
 
+<br />
+
 1、下载Android Studio 3.0，然后第一次打开Android Studio之后会弹出一个欢迎界面。我们点击右下角的Configure按钮，如下图所示。
 
-![1.jpg](http://upload-images.jianshu.io/upload_images/8136508-17eec432b96af7b9.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![1.jpg](https://github.com/zenny-chen/Using-C-and-Assembly-Language-in-Android-Studio-3.0/blob/master/1.jpg)
+
+<br />
 
 2、然后会弹出一个列表框，我们选择第一个：SDK Manager，然后会弹出如下图所示的对话框。我们在中间栏点击“SDK Tools”，这里需要至少增加三个选项——“CMake”，“LLDB”以及“NDK”。
 
-![2.jpg](http://upload-images.jianshu.io/upload_images/8136508-4f18be7a23b9eb7f.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![2.jpg](https://github.com/zenny-chen/Using-C-and-Assembly-Language-in-Android-Studio-3.0/blob/master/2.jpg)
+
+<br />
 
 3、选完了之后，我们开始安装。安装完之后，我们开始新建一个全新的工程。我们在配置这个工程的时候可以根据自己的喜好进行设置，当然大部分用默认的配置即可，不过我们这里要增加对C语言支持的选项，如下图所示。
 
-![3.jpg](http://upload-images.jianshu.io/upload_images/8136508-eadfabd4a0bcc6d7.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![3.jpg](https://github.com/zenny-chen/Using-C-and-Assembly-Language-in-Android-Studio-3.0/blob/master/3.jpg)
+
+<br />
 
 4、这里勾选之后，后面的配置可以不用管。点击Finish之后需要等待一些时间让IDE做项目配置以及初始编译。最后我们进入到了主工程中。
 
-这里需要提醒各位的是，在Android Studio 3.3之后，我们必须在第一个界面“Choose your project”中选择“**Native C++**”才能看见后面对C++配置的向导界面，否则是没有的。选用“Native C++”这个项目配置其实就相当于用空活动配置加上对JNI的使用来创建一个项目。
+这里需要提醒各位的是，在Android Studio 3.3之后，我们必须在第一个界面“Choose your project”中选择“ **Native C++** ”才能看见后面对C++配置的向导界面，否则是没有的。选用“Native C++”这个项目配置其实就相当于用空活动配置加上对JNI的使用来创建一个项目。
+
+<br />
 
 到了主工程中，我们先别着急去写C代码，因为此时还没有C源文件，我们可以先配置build.gradle(Module:app)配置文件，这里列出android配置部分：
 
@@ -66,6 +76,8 @@ android {
 ```
 
 这里各位请注意内部的cmake部分，这里使用了构建参数以及全局编译选项。然后再注意一下对ndk的配置，这里加入了在本项目工程中所支持的ABI架构。ABI架构可以根据自己的需求进行配置，不过笔者所列出的这几个已经能涵盖当前活跃的绝大部分的安卓设备了。
+
+<br />
 
 接下去，我们可以把IDE自动生成的native-lib.cpp文件名修改为native-lib.c，然后编辑成以下C代码：
 
@@ -139,6 +151,8 @@ MyASMTest:
 
 ```
 
+<br />
+
 最后，我们对CMakeLists.txt进行编辑，这里面需要引入YASM汇编器。此外，我们还要把所编辑的C源文件与汇编源文件加入到所要生成的动态库中。
 
 ```cmake
@@ -198,6 +212,8 @@ target_link_libraries( # Specifies the target library.
 ```
 
 我们这里使用了条件判断，只有在当前所编译的架构为x86_64的情况下才把test.asm给加入到所编译的库中。
+
+<br />
 
 上述文件都编辑好之后，我们就可以开测了。如果各位没有x86的安卓设备，那么我们可以新建一个基于x86-64架构的模拟器，x86-64架构的模拟器运行速度还是挺快的，而对于ARM架构的处理器，我们最好用真机来测。
 
@@ -262,6 +278,8 @@ target_link_libraries( # Specifies the target library.
         ${log-lib})
 ```
 
+<br />
+
 在很多时候，我们在Android Studio中写C和汇编时可能还需要引入第三方的库，而第三方的库可能是静态库也可能是动态库。如果我们要把这些库引入到自己的项目中的话则需要添加对这些库的引用。下面，假定我们用独立的Android NDK在自己当前的项目中构建了一个名为“innerC”的动态库，如果我们想在Android Studio的C语言项目中引用它的话则需要先对`build.gradle (Module:app)`文件进行修改，在`buildTypes { }`语句块下面添加：
 ```gradle
     sourceSets {
@@ -289,6 +307,8 @@ set_target_properties( # Specifies the target library.
 ```
 然后，在`target_link_libraries`中添加：`innerC `。
 
+<br />
+
 如果我们所引用的innerC模块是静态库（.a）的形式，那么将上面两行CMake命令改为以下形式即可：
 ```cmake
 add_library(innerC
@@ -308,6 +328,8 @@ set_target_properties( # Specifies the target library.
 顺便一提，如果我们想在独立的NDK项目中最终生成静态库文件，那么只需要将原来的`include $(BUILD_SHARED_LIBRARY)`指示语句改写为`include $(BUILD_STATIC_LIBRARY)`即可。如果我们想在Android Studio项目的C语言中包含第三方库的头文件，也可以在CMakeLists文件中使用`include_directories(imported-lib/include/ )`命令即可。
 
 **这里还需要额外提供一些注意事项！** 在Android Studio 3.3之后，Google这个沙雕特么把`${PROJECT_SOURCE_DIR}`这个目录的位置换掉了，从以前的`<项目名>/app/`变为了：`<项目名>/app/src/main/cpp/`。所以各位用新的Android Studio从自带NDK的cmake做外部库连接的时候需要特别注意，可以将`/app/libs`这一文件夹拷贝到`/app/src/main/cpp/`目录下；也可以直接通过`../`的方式去找。笔者更偏向于第一种方案，第二种太过丑陋～
+
+<br />
 
 最后，笔者提供一下各位可用于参考的Google官方给的使用Android Studio来写JNI的例子：[https://github.com/googlesamples/android-ndk](https://github.com/googlesamples/android-ndk)。
 
