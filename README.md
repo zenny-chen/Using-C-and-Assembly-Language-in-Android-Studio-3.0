@@ -135,7 +135,7 @@ JNICALL jstring Java_com_greengames_zennychen_ctest_MainActivity_stringFromJNI
 ```
 
 上述C代码对AArch32与AArch64架构下的内联汇编以及对x86_64架构下待会儿要使用的独立的YASM汇编器编译的汇编代码进行了引用。下面我们可以在默认的cpp文件夹下再新增一个名为test.asm的汇编文件，输入以下x86_64的汇编代码：
-```x86asm
+```nasm
 ; 这是一个汇编文件
 ; YASM的注释风格使用分号形式
 
