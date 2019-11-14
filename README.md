@@ -48,11 +48,11 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                // 使用NEON技术
-                arguments "-DANDROID_ARM_NEON=TRUE"
+                // 对于ARMv7架构使用NEON技术，并且对于32位的ARM执行模式使用ARM指令集而不是默认的Thumb指令集
+                arguments "-DANDROID_ARM_NEON=TRUE", "-DANDROID_ARM_MODE=arm"
 
                 // C语言使用GNU17标准
-                cFlags "-std=gnu17 -Os"
+                cFlags "-std=gnu17", "-Os"
             }
         }
         ndk {
